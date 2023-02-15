@@ -40,11 +40,11 @@ function prepare_environment () {
 function prepare_ansible () {
   # update user pip and initiate venv
   su -c "python3 -m pip install --upgrade pip ; \
-    pip install virtualenv ; \
-    venv $QUANSIBLE_VENV" $USER_ADMIN
+    python3 -m pip install virtualenv ; \
+    python3 -m venv $QUANSIBLE_VENV" $USER_ADMIN
   
   # update venv, install ansible in venv
-  su -c "venv $QUANSIBLE_VENV && \
+  su -c "python3 -m venv $QUANSIBLE_VENV ; \
     source $QUANSIBLE_VENV/bin/activate ;  \
     python3 -m pip install --upgrade pip ; \
     python3 -m pip install wheel ; \
@@ -53,7 +53,6 @@ function prepare_ansible () {
 }
 
 function build_quansible () {
-  su $USER_ADMIN
   su -c "source $QUANSIBLE_VENV/bin/activate ; \
     ansible-playbook --extra-vars "nodes=localhost path=$SCRIPT_DIR" "$SCRIPT_DIR/quansible/init_config.yaml" --ask-become-pass" $USER_ADMIN
   #deactivate
@@ -78,7 +77,7 @@ if [[ $1 == "setup-env" ]]
 then
   prepare_environment
   prepare_ansible
-  #build_quansible
+  build_quansible
   exit
 elif [[ $1 == "update" ]]
 then

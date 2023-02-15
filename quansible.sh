@@ -5,6 +5,7 @@ USER_ADMIN=""
 ROOT_DIR=""
 QUANSIBLE_VENV=""
 DOCKER_MODE=""
+ANSIBLE_VERSION=""
 
 function prepare_environment () {
   apt update
@@ -25,10 +26,10 @@ function prepare_environment () {
   ANSIBLE_VERSION="$(yq e '.quansible_ansible_version' quansible/config.yaml)"
   QUANSIBLE_VENV=$SCRIPT_DIR/venv
   useradd -m $USER_ADMIN --shell /bin/bash
-  echo "$USER_ADMIN ALL=(ALL) NOPASSWD:ALL" >> sudo /etc/sudoers.d/$USER_ADMIN
-  
+  echo "$USER_ADMIN ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/$USER_ADMIN
+
   # give full ownership to the ansible user
-  chown -R $USER_ADMIN:$USER_ADMIN $SCRIPT_DIR
+  #chown -R $USER_ADMIN:$USER_ADMIN $SCRIPT_DIR
   locale-gen en_GB.UTF-8
   #locale-gen en_GB
   update-locale LANG=en_GB.UTF-8
@@ -38,16 +39,16 @@ function prepare_environment () {
 # update quansible environment
 function prepare_ansible () {
   # update user pip and initiate venv
-  su -c "python3 -m pip install --upgrade pip ; && \
-    pip install virtualenv ; && \
-    venv $QUANSIBLE_VENV" -m "$USER_ADMIN" 
+  su -c "python3 -m pip install --upgrade pip ; \
+    pip install virtualenv ; \
+    venv $QUANSIBLE_VENV" $USER_ADMIN
   
   # update venv, install ansible in venv
   su -c "venv $QUANSIBLE_VENV && \
-    source $QUANSIBLE_VENV/bin/activate ; && \
-    python3 -m pip install --upgrade ; pip && \
-    python3 -m pip install wheel ; && \
-    python3 -m pip install ansible==$ANSIBLE_VERSION"  -m "$USER_ADMIN" 
+    source $QUANSIBLE_VENV/bin/activate ;  \
+    python3 -m pip install --upgrade pip ; \
+    python3 -m pip install wheel ; \
+    python3 -m pip install ansible==$ANSIBLE_VERSION" $USER_ADMIN 
   return
 }
 

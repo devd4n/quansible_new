@@ -54,19 +54,20 @@ function prepare_ansible () {
 
 function build_quansible () {
   su $USER_ADMIN
-  source $QUANSIBLE_VENV/bin/activate
-  ansible-playbook --extra-vars "nodes=localhost path=$SCRIPT_DIR" "$SCRIPT_DIR/quansible/init_config.yaml" --ask-become-pass
+  su -c "source $QUANSIBLE_VENV/bin/activate ; \
+    ansible-playbook --extra-vars "nodes=localhost path=$SCRIPT_DIR" "$SCRIPT_DIR/quansible/init_config.yaml" --ask-become-pass" $USER_ADMIN
   #deactivate
   if [[ $DOCKER_MODE == true ]]
   then
-     sudo apt-get update
-     sudo apt install docker.io -y
-     sudo usermod -aG docker $USER_ADMIN
-     docker build -t quansible
-     docker run -it quansible
+     apt-get update
+     apt install docker.io -y
+     usermod -aG docker $USER_ADMIN
+     su -c "docker build -t quansible ; \
+       docker run -it quansible" $USER_ADMIN
      exit
   else
-    ansible-playbook --extra-vars  @"$SCRIPT_DIR/quansible/ansible_vars.yaml" $SCRIPT_DIR/quansible/init_config.yaml --ask-become-pass
+    su -c "source $QUANSIBLE_VENV/bin/activate ; \
+      ansible-playbook --extra-vars  "@$SCRIPT_DIR/quansible/ansible_vars.yaml" $SCRIPT_DIR/quansible/init_config.yaml --ask-become-pass" $USER_ADMIN
     exit
   fi
   return

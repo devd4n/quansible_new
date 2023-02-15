@@ -1,0 +1,20 @@
+- name: Initialize ansible mgmt host localy
+  hosts: localhost
+  connection: local
+  become: yes
+
+  tasks:
+  - name: template file to final location
+    template:                 # Ansible template module
+      src: "{{ path }}/quansible/build/quansible.yaml.j2"      # This is template src i.e source location 
+      dest: "{{ path }}/quansible/quansible.yaml"   # Destination of Remote host
+
+  - name: template file to final location
+    template:                 # Ansible template module
+      src: "{{ path }}/quansible/build/ansible.cfg.j2"      # This is template src i.e source location 
+      dest: "{{ path }}/quansible/ansible.cfg.yaml"   # Destination of Remote host
+
+  - name: template file to final location
+    template:                 # Ansible template module
+      src: "{{ path }}/quansible/build/quansible.yaml.j2"      # This is template src i.e source location 
+      dest: "{{ path }}/quansible/ansible_vars.yaml"   # Destination of Remote host

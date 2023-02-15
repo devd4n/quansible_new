@@ -1,0 +1,12 @@
+quansible_root_dir: "/home/user_ansible_admin"
+quansible_venv: "home/user_ansible_admin"
+quansible_user_admin: "user_admin"
+quansible_user_ansible: "user_ansible_admin"
+
+quansible_roles_repo: "https://api.github.com/users/devd4n/repos"
+quansible_roles_repo_search: "ansible_role"
+
+#ansible_cfg_:
+#ansible_cfg_:
+
+dockermode_enable: false

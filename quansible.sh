@@ -32,7 +32,7 @@ function prepare_environment () {
   locale-gen en_GB.UTF-8
   #locale-gen en_GB
   update-locale LANG=en_GB.UTF-8
-  exit
+  return
 }
 
 # update quansible environment
@@ -48,7 +48,7 @@ function prepare_ansible () {
   python3 -m pip install --upgrade pip
   python3 -m pip install wheel
   python3 -m pip install ansible==$ANSIBLE_VERSION
-  exit
+  return
 }
 
 function build_quansible () {
@@ -68,7 +68,7 @@ function build_quansible () {
     ansible-playbook --extra-vars  @"$SCRIPT_DIR/quansible/ansible_vars.yaml" $SCRIPT_DIR/quansible/init_config.yaml --ask-become-pass
     exit
   fi
-  exit
+  return
 }
 
 # Run function defined by parameter of this script (setup | init)

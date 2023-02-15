@@ -1,5 +1,4 @@
 quansible_root_dir: "/home/user_ansible_admin"
-quansible_venv: "home/user_ansible_admin"
 quansible_user_admin: "user_admin"
 quansible_user_ansible: "user_ansible_admin"
 

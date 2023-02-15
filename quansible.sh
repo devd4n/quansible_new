@@ -21,10 +21,9 @@ function prepare_environment () {
   SCRIPT_DIR=$(pwd)
   USER_ADMIN="$(yq e '.quansible_user_admin' quansible/config.yaml)"
   ROOT_DIR="$(yq e '.quansible_root_dir' quansible/config.yaml)"
-  QUANSIBLE_VENV="$(yq e '.quansible_venv' quansible/config.yaml)"
   DOCKER_MODE="$(yq e '.docker-mode' quansible/config.yaml)"
   ANSIBLE_VERSION="$(yq e '.quansible_ansible_version' quansible/config.yaml)"
-
+  QUANSIBLE_VENV=$SCRIPT_DIR/venv
   sudo useradd -m $USER_ADMIN --shell /bin/bash
   sudo echo "$USER_ADMIN ALL=(ALL) NOPASSWD:ALL" >> sudo /etc/sudoers.d/$USER_ADMIN
   
@@ -33,6 +32,7 @@ function prepare_environment () {
   locale-gen en_GB.UTF-8
   #locale-gen en_GB
   update-locale LANG=en_GB.UTF-8
+  exit
 }
 
 # update quansible environment
@@ -48,7 +48,7 @@ function prepare_ansible () {
   python3 -m pip install --upgrade pip
   python3 -m pip install wheel
   python3 -m pip install ansible==$ANSIBLE_VERSION
-  logout
+  exit
 }
 
 function build_quansible () {
@@ -68,7 +68,7 @@ function build_quansible () {
     ansible-playbook --extra-vars  @"$SCRIPT_DIR/quansible/ansible_vars.yaml" $SCRIPT_DIR/quansible/init_config.yaml --ask-become-pass
     exit
   fi
-  logout
+  exit
 }
 
 # Run function defined by parameter of this script (setup | init)

@@ -17,17 +17,18 @@ function prepare_environment () {
   #curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
   # ansible needs a UTF-8 locale
   
+  sudo snap install yq
   SCRIPT_DIR=$(pwd)
   USER_ADMIN="$(yq e '.quansible_user_admin' quansible/config.yaml)"
   ROOT_DIR="$(yq e '.quansible_root_dir' quansible/config.yaml)"
   QUANSIBLE_VENV="$(yq e '.quansible_venv' quansible/config.yaml)"
   DOCKER_MODE="$(yq e '.docker-mode' quansible/config.yaml)"
+  ANSIBLE_VERSION="$(yq e '.quansible_ansible_version' quansible/config.yaml)"
 
   sudo useradd -m $USER_ADMIN --shell /bin/bash
   sudo echo "$USER_ADMIN ALL=(ALL) NOPASSWD:ALL" >> sudo /etc/sudoers.d/$USER_ADMIN
   
   # give full ownership to the ansible user
-  sudo chown -R $USER_ADMIN:$USER_ADMIN $ROOT_DIR
   sudo chown -R $USER_ADMIN:$USER_ADMIN $SCRIPT_DIR
   locale-gen en_GB.UTF-8
   #locale-gen en_GB
@@ -47,6 +48,7 @@ function prepare_ansible () {
   python3 -m pip install --upgrade pip
   python3 -m pip install wheel
   python3 -m pip install ansible==$ANSIBLE_VERSION
+  logout
 }
 
 function build_quansible () {
@@ -54,8 +56,7 @@ function build_quansible () {
   source $QUANSIBLE_VENV/bin/activate
   ansible-playbook --extra-vars "nodes=localhost path=$SCRIPT_DIR" "$SCRIPT_DIR/quansible/init_config.yaml" --ask-become-pass
   #deactivate
-  logout
-  if [[ $DOCKER_MODE ]]
+  if [[ $DOCKER_MODE == true ]]
   then
      sudo apt-get update
      sudo apt install docker.io -y
@@ -67,6 +68,7 @@ function build_quansible () {
     ansible-playbook --extra-vars  @"$SCRIPT_DIR/quansible/ansible_vars.yaml" $SCRIPT_DIR/quansible/init_config.yaml --ask-become-pass
     exit
   fi
+  logout
 }
 
 # Run function defined by parameter of this script (setup | init)

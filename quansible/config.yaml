@@ -6,6 +6,8 @@ quansible_user_ansible: "user_ansible_admin"
 quansible_roles_repo: "https://api.github.com/users/devd4n/repos"
 quansible_roles_repo_search: "ansible_role"
 
+quansible_ansible_version: "7.2.0"
+
 #ansible_cfg_:
 #ansible_cfg_:
 

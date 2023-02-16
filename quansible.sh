@@ -54,7 +54,7 @@ function prepare_ansible () {
 
 function build_quansible () {
   su -c "source $QUANSIBLE_VENV/bin/activate ; \
-    ansible-playbook --extra-vars "nodes=localhost path=$SCRIPT_DIR" "$SCRIPT_DIR/quansible/init_config.yaml" --ask-become-pass" $USER_ADMIN
+    ansible-playbook -e path=$SCRIPT_DIR $SCRIPT_DIR/quansible/init_config.yaml --ask-become-pass" $USER_ADMIN
   #deactivate
   if [[ $DOCKER_MODE == true ]]
   then
@@ -66,23 +66,29 @@ function build_quansible () {
      exit
   else
     su -c "source $QUANSIBLE_VENV/bin/activate ; \
-      ansible-playbook --extra-vars  "@$SCRIPT_DIR/quansible/ansible_vars.yaml" $SCRIPT_DIR/quansible/init_config.yaml --ask-become-pass" $USER_ADMIN
+      ansible-playbook --extra-vars  "@$SCRIPT_DIR/quansible/ansible_vars.yaml" $SCRIPT_DIR/quansible/init_quansible.yaml --ask-become-pass" $USER_ADMIN
     exit
   fi
   return
 }
 
 # Run function defined by parameter of this script (setup | init)
-if [[ $1 == "setup-env" ]]
+if [[ $1 == "install" ]]
 then
   prepare_environment
-  prepare_ansible
-  build_quansible
+  su -c "quansible.sh prepare_ansible" $USER_ADMIN
+  su -c "quansible.sh update-env" $USER_ADMIN
   exit
-elif [[ $1 == "update" ]]
+elif [[ $1 == "update-env" ]]
 then
-  echo "currently not available"
+  prepare_environment
+elif [[ $1 == "update-ansible" ]]
+then
+  prepare_ansible
+elif [[ $1 == "build" ]]
+then
+  build_quansible
 else
-  echo "usage: $0 <setup-env|update|update-roles|upgrade>"
+  echo "usage: $0 <update-env|update|update-roles|upgrade>"
   exit
 fi

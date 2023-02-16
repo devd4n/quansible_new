@@ -39,34 +39,34 @@ function prepare_environment () {
 # update quansible environment
 function prepare_ansible () {
   # update user pip and initiate venv
-  su -c "python3 -m pip install --upgrade pip ; \
-    python3 -m pip install virtualenv ; \
-    python3 -m venv $QUANSIBLE_VENV" $USER_ADMIN
+  python3 -m pip install --upgrade pip
+  python3 -m pip install virtualenv
+  python3 -m venv $QUANSIBLE_VENV
   
   # update venv, install ansible in venv
-  su -c "python3 -m venv $QUANSIBLE_VENV ; \
-    source $QUANSIBLE_VENV/bin/activate ;  \
-    python3 -m pip install --upgrade pip ; \
-    python3 -m pip install wheel ; \
-    python3 -m pip install ansible==$ANSIBLE_VERSION" $USER_ADMIN 
+  python3 -m venv $QUANSIBLE_VENV
+  source $QUANSIBLE_VENV/bin/activate
+  python3 -m pip install --upgrade pip
+  python3 -m pip install wheel
+  python3 -m pip install ansible==$ANSIBLE_VERSION
+  deactivate
   return
 }
 
 function build_quansible () {
-  su -c "source $QUANSIBLE_VENV/bin/activate ; \
-    ansible-playbook -e path=$SCRIPT_DIR $SCRIPT_DIR/quansible/init_config.yaml --ask-become-pass" $USER_ADMIN
-  #deactivate
+  source $QUANSIBLE_VENV/bin/activate ; \
+  ansible-playbook -e path=$SCRIPT_DIR $SCRIPT_DIR/quansible/init_config.yaml --ask-become-pass $USER_ADMIN
+  deactivate
   if [[ $DOCKER_MODE == true ]]
   then
      apt-get update
      apt install docker.io -y
      usermod -aG docker $USER_ADMIN
-     su -c "docker build -t quansible ; \
-       docker run -it quansible" $USER_ADMIN
-     exit
+     docker build -t quansible
+     docker run -it quansible
   else
-    su -c "source $QUANSIBLE_VENV/bin/activate ; \
-      ansible-playbook --extra-vars  "@$SCRIPT_DIR/quansible/ansible_vars.yaml" $SCRIPT_DIR/quansible/init_quansible.yaml --ask-become-pass" $USER_ADMIN
+     source $QUANSIBLE_VENV/bin/activate
+     ansible-playbook --extra-vars @$SCRIPT_DIR/quansible/ansible_vars.yaml $SCRIPT_DIR/quansible/init_quansible.yaml --ask-become-pass
     exit
   fi
   return

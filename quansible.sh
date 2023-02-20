@@ -33,14 +33,17 @@ function prepare_environment () {
   locale-gen en_GB.UTF-8
   #locale-gen en_GB
   update-locale LANG=en_GB.UTF-8
-  chown -R $USER_ADMIN:$USER_ADMIN $ROOT_DIR 
+  chown -R $USER_ADMIN:$USER_ADMIN $SCRIPT_DIR 
   return
 }
 
 # update quansible environment
 function prepare_ansible () {
   ANSIBLE_VERSION="$(yq e '.quansible_ansible_version' quansible/config.yaml)"
+  ROOT_DIR="$(yq e '.quansible_root_dir' quansible/config.yaml)"
+  SCRIPT_DIR=$(pwd)
   QUANSIBLE_VENV=$SCRIPT_DIR/venv
+
   # update user pip and initiate venv
   python3 -m pip install --upgrade pip
   python3 -m pip install virtualenv
@@ -97,6 +100,6 @@ elif [[ $1 == "build" ]]
 then
   build_quansible
 else
-  echo "usage: $0 <update-env|update|update-roles|upgrade>"
+  echo "usage: $0 <update-env|update-ansible|build|upgrade>"
   exit
 fi

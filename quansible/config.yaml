@@ -1,6 +1,6 @@
 quansible_root_dir: "/home/user_ansible_admin"
 quansible_user_admin: "user_admin"
-quansible_user_ansible: "user_ansible_admin"
+quansible_user_ansible: "user_ansible"
 
 quansible_roles_repo: "https://api.github.com/users/devd4n/repos"
 quansible_roles_repo_search: "ansible_role"
@@ -11,3 +11,6 @@ quansible_ansible_version: "7.2.0"
 #ansible_cfg_:
 
 dockermode_enable: false
+#docker_python_version:
+#docker_pip_version:
+#docker_base_image:

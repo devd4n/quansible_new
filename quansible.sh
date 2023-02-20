@@ -33,11 +33,14 @@ function prepare_environment () {
   locale-gen en_GB.UTF-8
   #locale-gen en_GB
   update-locale LANG=en_GB.UTF-8
+  chown -R $USER_ANSIBLE:$USER_ANSIBLE $ROOT_DIR 
   return
 }
 
 # update quansible environment
 function prepare_ansible () {
+  ANSIBLE_VERSION="$(yq e '.quansible_ansible_version' quansible/config.yaml)"
+  QUANSIBLE_VENV=$SCRIPT_DIR/venv
   # update user pip and initiate venv
   python3 -m pip install --upgrade pip
   python3 -m pip install virtualenv
@@ -54,19 +57,24 @@ function prepare_ansible () {
 }
 
 function build_quansible () {
-  source $QUANSIBLE_VENV/bin/activate ; \
+  SCRIPT_DIR=$(pwd)
+  USER_ADMIN="$(yq e '.quansible_user_admin' quansible/config.yaml)"
+  DOCKER_MODE="$(yq e '.docker-mode' quansible/config.yaml)"
+  QUANSIBLE_VENV=$SCRIPT_DIR/venv
+  source $QUANSIBLE_VENV/bin/activate
   ansible-playbook -e path=$SCRIPT_DIR $SCRIPT_DIR/quansible/init_config.yaml --ask-become-pass $USER_ADMIN
   deactivate
   if [[ $DOCKER_MODE == true ]]
   then
-     apt-get update
-     apt install docker.io -y
-     usermod -aG docker $USER_ADMIN
-     docker build -t quansible
-     docker run -it quansible
+     sudo apt-get update
+     sudo apt install docker.io -y
+     sudo usermod -aG docker $USER_ADMIN
+     sudo docker build -t quansible
+     sudo docker run -it quansible
   else
      source $QUANSIBLE_VENV/bin/activate
      ansible-playbook --extra-vars @$SCRIPT_DIR/quansible/ansible_vars.yaml $SCRIPT_DIR/quansible/init_quansible.yaml --ask-become-pass
+     deactivate
     exit
   fi
   return
@@ -76,8 +84,8 @@ function build_quansible () {
 if [[ $1 == "install" ]]
 then
   prepare_environment
-  su -c "quansible.sh prepare_ansible" $USER_ADMIN
-  su -c "quansible.sh update-env" $USER_ADMIN
+  su -c "quansible.sh update_ansible" $USER_ADMIN
+  su -c "quansible.sh build" $USER_ADMIN
   exit
 elif [[ $1 == "update-env" ]]
 then

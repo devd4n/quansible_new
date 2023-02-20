@@ -33,7 +33,7 @@ function prepare_environment () {
   locale-gen en_GB.UTF-8
   #locale-gen en_GB
   update-locale LANG=en_GB.UTF-8
-  chown -R $USER_ANSIBLE:$USER_ANSIBLE $ROOT_DIR 
+  chown -R $USER_ADMIN:$USER_ADMIN $ROOT_DIR 
   return
 }
 
@@ -69,8 +69,8 @@ function build_quansible () {
      sudo apt-get update
      sudo apt install docker.io -y
      sudo usermod -aG docker $USER_ADMIN
-     sudo docker build -t quansible
-     sudo docker run -it quansible
+     #docker build -t quansible
+     #docker run -it quansible
   else
      source $QUANSIBLE_VENV/bin/activate
      ansible-playbook --extra-vars @$SCRIPT_DIR/quansible/ansible_vars.yaml $SCRIPT_DIR/quansible/init_quansible.yaml --ask-become-pass

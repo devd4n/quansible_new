@@ -69,15 +69,16 @@ function build_quansible () {
   deactivate
   if [[ $DOCKER_MODE == true ]]
   then
-     sudo apt-get update
+     sudo apt-get update -y
      sudo apt install docker.io -y
+     
      sudo usermod -aG docker $USER_ADMIN
      #docker build -t quansible
      #docker run -it quansible
   else
-     #source $QUANSIBLE_VENV/bin/activate
-     #ansible-playbook --extra-vars @$SCRIPT_DIR/quansible/ansible_vars.yaml $SCRIPT_DIR/quansible/init_quansible.yaml --ask-become-pass
-     #deactivate
+     source $QUANSIBLE_VENV/bin/activate
+     ansible-playbook --extra-vars @$SCRIPT_DIR/quansible/ansible_vars.yaml $SCRIPT_DIR/quansible/init_quansible.yaml --ask-become-pass
+     deactivate
     exit
   fi
   return

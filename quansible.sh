@@ -19,6 +19,8 @@ function prepare_environment () {
   # ansible needs a UTF-8 locale
   
   snap install yq
+  #CURRENT_USER=$(whoami)
+  #chown -R $CURRENT_USER:$CURRENT_USER $SCRIPT_DIR 
   SCRIPT_DIR=$(pwd)
   USER_ADMIN="$(yq e '.quansible_user_admin' quansible/config.yaml)"
   ROOT_DIR="$(yq e '.quansible_root_dir' quansible/config.yaml)"
@@ -65,7 +67,7 @@ function build_quansible () {
   DOCKER_MODE="$(yq e '.docker-mode' quansible/config.yaml)"
   QUANSIBLE_VENV="$SCRIPT_DIR/venv"
   source $QUANSIBLE_VENV/bin/activate
-  ansible-playbook -e path=$SCRIPT_DIR $SCRIPT_DIR/quansible/init_config.yaml --ask-become-pass $USER_ADMIN
+  ansible-playbook -e path=$SCRIPT_DIR $SCRIPT_DIR/quansible/init_config.yaml --ask-become-pass
   deactivate
   if [[ $DOCKER_MODE == true ]]
   then
@@ -89,8 +91,8 @@ if [[ $1 == "install" ]]
 then
   prepare_environment
   USER_ADMIN="$(yq e '.quansible_user_admin' quansible/config.yaml)"
-  su -c "quansible.sh update_ansible" $USER_ADMIN
-  su -c "quansible.sh build" $USER_ADMIN
+  su -c "./quansible.sh update_ansible" $USER_ADMIN
+  su -c "./quansible.sh build" $USER_ADMIN
   exit
 elif [[ $1 == "update-env" ]]
 then

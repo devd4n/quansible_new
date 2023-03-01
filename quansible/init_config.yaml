@@ -1,4 +1,4 @@
-- name: Initialize ansible mgmt host localy
+- name: Create Configurations from template
   hosts: localhost
   connection: local
   become: yes
@@ -12,7 +12,7 @@
   - name: template file to final location
     template:                 # Ansible template module
       src: "{{ path }}/quansible/build/ansible.cfg.j2"      # This is template src i.e source location 
-      dest: "{{ path }}/quansible/ansible.cfg.yaml"   # Destination of Remote host
+      dest: "{{ path }}/quansible/ansible.cfg"   # Destination of Remote host
 
   - name: template file to final location
     template:                 # Ansible template module

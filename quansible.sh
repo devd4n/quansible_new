@@ -63,8 +63,9 @@ function build_quansible () {
   SCRIPT_DIR=$(pwd)
   USER_ADMIN="$(yq e '.quansible_user_admin' quansible/config.yaml)"
   DOCKER_MODE="$(yq e '.docker-mode' quansible/config.yaml)"
-  QUANSIBLE_VENV=$SCRIPT_DIR/venv  source $QUANSIBLE_VENV/bin/activate
-  ansible-playbook --extra-vars @$SCRIPT_DIR/quansible/config.yaml --extra-vars path=$SCRIPT_DIR $SCRIPT_DIR/quansible/init_config.yaml --ask-become-pass
+  QUANSIBLE_VENV="$SCRIPT_DIR/venv"
+  source $QUANSIBLE_VENV/bin/activate
+  ansible-playbook -e path=$SCRIPT_DIR $SCRIPT_DIR/quansible/init_config.yaml --ask-become-pass $USER_ADMIN
   deactivate
   if [[ $DOCKER_MODE == true ]]
   then
@@ -86,6 +87,7 @@ function build_quansible () {
 if [[ $1 == "install" ]]
 then
   prepare_environment
+  USER_ADMIN="$(yq e '.quansible_user_admin' quansible/config.yaml)"
   su -c "quansible.sh update_ansible" $USER_ADMIN
   su -c "quansible.sh build" $USER_ADMIN
   exit
